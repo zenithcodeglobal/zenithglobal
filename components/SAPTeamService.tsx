@@ -34,6 +34,7 @@ export default function SAPTeamService() {
     return (
         <section
             id="sap-team-service"
+            data-navbar-theme="light"
             className="relative z-50 w-full py-16 md:py-24 px-4 md:px-8"
             style={{ backgroundColor: '#F4F4EA' }}
         >

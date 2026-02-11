@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -23,10 +24,12 @@ const items = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [ready, setReady] = useState(false)
-  const [videoMode, setVideoMode] = useState(false) // New state for Logo vs Tagline
+  const [videoMode, setVideoMode] = useState(false) // Logo vs Tagline
   const [isVisible, setIsVisible] = useState(true) // Navbar visibility
+  const [lightBg, setLightBg] = useState(false) // Dark text on light sections
   const [lastScrollY, setLastScrollY] = useState(0)
   const pathname = usePathname()
+  const headerRef = useRef(null)
 
   // Use GSAP for Scroll ScrollTrigger - trigger when video is fully visible
   useGSAP(() => {
@@ -59,7 +62,7 @@ export default function Navbar() {
     return () => window.removeEventListener('intro:done', handler)
   }, [])
 
-  // Scroll direction detection for auto-hide navbar
+  // Scroll direction detection + light-background detection
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -76,16 +79,41 @@ export default function Navbar() {
       }
 
       setLastScrollY(currentScrollY)
+
+      // Detect if navbar overlaps a light-background section
+      const navbarHeight = headerRef.current?.offsetHeight || 70
+      const lightSections = document.querySelectorAll('[data-navbar-theme="light"]')
+      let isOverLight = false
+
+      lightSections.forEach((section) => {
+        const rect = section.getBoundingClientRect()
+        // Check if the navbar (top ~0 to navbarHeight) overlaps this section
+        if (rect.top < navbarHeight && rect.bottom > 0) {
+          isOverLight = true
+        }
+      })
+
+      setLightBg(isOverLight)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [lastScrollY])
 
-  // Keep existing reveal/hide logic for specific pages if needed, but simplify for this request
+  // Dynamic color classes
+  const textColor = lightBg ? 'text-black/80' : 'text-white/80'
+  const textColorStrong = lightBg ? 'text-black' : 'text-white'
+  const navLinkColor = lightBg ? 'text-black/60 hover:text-black' : 'text-white/60 hover:text-white'
+  const contactBtnClass = lightBg
+    ? 'bg-black/10 hover:bg-black/20 hover:text-black text-black/80 border-black/20'
+    : 'bg-white/10 hover:bg-white/20 hover:text-white text-white/80 border-white/10'
+  const mobileBtnClass = lightBg
+    ? 'bg-black/10 text-black/90 hover:bg-black/20'
+    : 'bg-white/10 text-white/90 hover:bg-white/20'
 
   return (
     <motion.header
+      ref={headerRef}
       initial={{ opacity: 0, y: -6 }}
       animate={ready ? {
         opacity: 1,
@@ -95,26 +123,57 @@ export default function Navbar() {
         y: -6
       }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed inset-x-0 top-0 z-50 bg-transparent transition-colors duration-500`}
+      className="fixed inset-x-0 top-0 z-[60] bg-transparent"
+      style={{ transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)' }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 md:px-10 py-5">
 
-        {/* LOGO / TAGLINE AREA */}
-        <div className="relative z-50 h-6 flex items-center overflow-hidden w-[300px]">
-          {/* Tagline */}
-          <span
-            className={`absolute left-0 top-1/2 -translate-y-1/2 text-white/80 font-mono text-[10px] sm:text-xs tracking-widest uppercase transition-all duration-500 ${videoMode ? 'opacity-0 -translate-y-full' : 'opacity-100 translate-y-[-50%]'}`}
+        {/* LOGO / TAGLINE AREA — 3D Flip Card */}
+        <div className="relative z-50" style={{ perspective: '600px' }}>
+          <div
+            className="relative w-[280px] sm:w-[300px] h-8"
+            style={{
+              transformStyle: 'preserve-3d',
+              transition: 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+              transform: videoMode ? 'rotateX(180deg)' : 'rotateX(0deg)',
+            }}
           >
-            TURNING COMPLEXITY INTO CLARITY
-          </span>
+            {/* Front Face — Tagline */}
+            <div
+              className="absolute inset-0 flex items-center"
+              style={{ backfaceVisibility: 'hidden' }}
+            >
+              <span
+                className={`font-mono text-[10px] sm:text-xs tracking-widest uppercase whitespace-nowrap transition-colors duration-400 ${textColor}`}
+              >
+                TURNING COMPLEXITY INTO CLARITY
+              </span>
+            </div>
 
-          {/* Logo (Appears on Scroll) */}
-          <Link
-            href="/"
-            className={`absolute left-0 top-1/2 -translate-y-1/2 text-white font-[family-name:var(--font-outfit)] font-bold text-xl tracking-tight transition-all duration-500 ${videoMode ? 'opacity-100 translate-y-[-50%]' : 'opacity-0 translate-y-full'}`}
-          >
-            ZENITH
-          </Link>
+            {/* Back Face — Zenith Logo */}
+            <div
+              className="absolute inset-0 flex items-center"
+              style={{
+                backfaceVisibility: 'hidden',
+                transform: 'rotateX(180deg)',
+              }}
+            >
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/zenith_logo.png"
+                  alt="Zenith"
+                  width={28}
+                  height={28}
+                  className="object-contain"
+                />
+                <span
+                  className={`font-[family-name:var(--font-outfit)] font-bold text-lg tracking-tight transition-colors duration-400 ${textColorStrong}`}
+                >
+                  ZENITH
+                </span>
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* DESKTOP NAV */}
@@ -123,7 +182,7 @@ export default function Navbar() {
             <Link
               key={i.label}
               href={i.href}
-              className="text-white/60 hover:text-white transition-colors text-[13px] font-mono tracking-widest uppercase"
+              className={`transition-colors duration-400 text-[13px] font-mono tracking-widest uppercase ${navLinkColor}`}
             >
               {i.label}
             </Link>
@@ -134,7 +193,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             href="/contact"
-            className="hidden md:inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 hover:text-white text-white/80 px-4 py-2 text-[12px] font-mono tracking-widest uppercase transition-all backdrop-blur-sm border border-white/10 rounded-sm"
+            className={`hidden md:inline-flex items-center gap-2 px-4 py-2 text-[12px] font-mono tracking-widest uppercase transition-all duration-400 backdrop-blur-sm border rounded-sm ${contactBtnClass}`}
           >
             CONTACT <span className="text-xs">↗</span>
           </Link>
@@ -142,7 +201,7 @@ export default function Navbar() {
             aria-label="Toggle menu"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/90 hover:bg-white/20 z-50 backdrop-blur-md"
+            className={`md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full z-50 backdrop-blur-md transition-colors duration-400 ${mobileBtnClass}`}
           >
             <span className="sr-only">Menu</span>
             {open ? (
@@ -189,4 +248,3 @@ export default function Navbar() {
     </motion.header>
   )
 }
-

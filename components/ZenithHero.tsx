@@ -152,8 +152,8 @@ export default function ZenithHero() {
                 ref={heroContentRef}
                 className="absolute inset-0 w-full h-full z-10 bg-black flex flex-col items-center"
             >
-                {/* Main Massive Text - Top Aligned */}
-                <div ref={textWrapperRef} className="relative z-10 mt-[15vh]">
+                {/* Main Massive Text - Centered on Mobile, Top Aligned on Desktop */}
+                <div ref={textWrapperRef} className="relative z-10 mt-[15vh] w-full flex flex-col items-center px-6 md:px-0">
                     <h1
                         ref={textRef}
                         className="font-[family-name:var(--font-outfit)] font-bold tracking-tight text-[#f0f0f0] leading-none whitespace-nowrap select-none"
@@ -161,6 +161,13 @@ export default function ZenithHero() {
                     >
                         ZENITH
                     </h1>
+                    {/* Mobile Description - Below ZENITH, left-aligned */}
+                    <div className="mt-6 max-w-md md:hidden text-left w-full">
+                        <p className="text-sm font-light text-white/90 leading-relaxed">
+                            We design and build intelligent systems <br />
+                            <span className="text-white/60">that scale with your business and drive real outcomes.</span>
+                        </p>
+                    </div>
                 </div>
 
                 {/* Bottom Content Area */}

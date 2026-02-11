@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { gsap } from 'gsap'
 import './FlowingMenu.css'
 
@@ -9,19 +9,42 @@ function FlowingMenu({ items = [] }) {
         <div className="flowing-menu-wrap">
             <nav className="flowing-menu">
                 {items.map((item, idx) => (
-                    <FlowingMenuItem key={idx} {...item} />
+                    <FlowingMenuItem key={idx} index={idx} {...item} />
                 ))}
             </nav>
         </div>
     )
 }
 
-function FlowingMenuItem({ link, text, image }) {
+function FlowingMenuItem({ link, text, image, index }) {
     const itemRef = useRef(null)
     const marqueeRef = useRef(null)
     const marqueeInnerRef = useRef(null)
+    const [isMobile, setIsMobile] = useState(false)
 
     const animationDefaults = { duration: 0.6, ease: 'expo' }
+
+    // Detect mobile screen size
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768)
+        }
+
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
+    // Auto-expand first item on mobile
+    useEffect(() => {
+        if (isMobile && index === 0 && marqueeRef.current && marqueeInnerRef.current) {
+            // Animate the first item to visible state on mobile
+            gsap.timeline({ defaults: animationDefaults })
+                .set(marqueeRef.current, { y: '-101%' }, 0)
+                .set(marqueeInnerRef.current, { y: '101%' }, 0)
+                .to([marqueeRef.current, marqueeInnerRef.current], { y: '0%' }, 0)
+        }
+    }, [isMobile, index])
 
     const findClosestEdge = (mouseX, mouseY, width, height) => {
         const topEdgeDist = distMetric(mouseX, mouseY, width / 2, 0)
@@ -90,3 +113,4 @@ function FlowingMenuItem({ link, text, image }) {
 }
 
 export default FlowingMenu
+
