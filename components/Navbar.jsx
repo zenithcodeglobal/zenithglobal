@@ -100,6 +100,32 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [lastScrollY])
 
+  // Disable background scrolling when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+      if (typeof window !== 'undefined' && window.__lenis) {
+        window.__lenis.stop();
+      }
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      if (typeof window !== 'undefined' && window.__lenis) {
+        window.__lenis.start();
+      }
+    }
+    
+    // Cleanup on unmount or when state changes
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      if (typeof window !== 'undefined' && window.__lenis) {
+        window.__lenis.start();
+      }
+    }
+  }, [open]);
+
   // Dynamic color classes
   const textColor = lightBg ? 'text-black/80' : 'text-white/80'
   const textColorStrong = lightBg ? 'text-black' : 'text-white'
@@ -219,7 +245,11 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <motion.div className="md:hidden fixed inset-0 z-30 bg-black/95 backdrop-blur-xl" onClick={() => setOpen(false)}>
+        <motion.div 
+          className="md:hidden fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden touch-none overscroll-none min-h-screen" 
+          onClick={() => setOpen(false)}
+          data-lenis-prevent="true"
+        >
           <button
             aria-label="Close menu"
             onClick={() => setOpen(false)}

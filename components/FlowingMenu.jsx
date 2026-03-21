@@ -5,18 +5,27 @@ import { gsap } from 'gsap'
 import './FlowingMenu.css'
 
 function FlowingMenu({ items = [] }) {
+    // Track which item is active on mobile (only one at a time)
+    const [activeIndex, setActiveIndex] = useState(0)
+
     return (
         <div className="flowing-menu-wrap">
             <nav className="flowing-menu">
                 {items.map((item, idx) => (
-                    <FlowingMenuItem key={idx} index={idx} {...item} />
+                    <FlowingMenuItem
+                        key={idx}
+                        index={idx}
+                        {...item}
+                        isActive={activeIndex === idx}
+                        onActivate={() => setActiveIndex(idx)}
+                    />
                 ))}
             </nav>
         </div>
     )
 }
 
-function FlowingMenuItem({ link, text, image, index }) {
+function FlowingMenuItem({ link, text, image, index, isActive, onActivate }) {
     const itemRef = useRef(null)
     const marqueeRef = useRef(null)
     const marqueeInnerRef = useRef(null)
@@ -35,16 +44,23 @@ function FlowingMenuItem({ link, text, image, index }) {
         return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
-    // Auto-expand first item on mobile
+    // Mobile: expand/collapse based on isActive (controlled by parent)
     useEffect(() => {
-        if (isMobile && index === 0 && marqueeRef.current && marqueeInnerRef.current) {
-            // Animate the first item to visible state on mobile
+        if (!isMobile || !marqueeRef.current || !marqueeInnerRef.current) return
+
+        if (isActive) {
+            // Slide in from top
             gsap.timeline({ defaults: animationDefaults })
                 .set(marqueeRef.current, { y: '-101%' }, 0)
                 .set(marqueeInnerRef.current, { y: '101%' }, 0)
                 .to([marqueeRef.current, marqueeInnerRef.current], { y: '0%' }, 0)
+        } else {
+            // Slide out to bottom
+            gsap.timeline({ defaults: animationDefaults })
+                .to(marqueeRef.current, { y: '101%' }, 0)
+                .to(marqueeInnerRef.current, { y: '-101%' }, 0)
         }
-    }, [isMobile, index])
+    }, [isActive, isMobile])
 
     const findClosestEdge = (mouseX, mouseY, width, height) => {
         const topEdgeDist = distMetric(mouseX, mouseY, width / 2, 0)
@@ -59,6 +75,7 @@ function FlowingMenuItem({ link, text, image, index }) {
     }
 
     const handleMouseEnter = (ev) => {
+        if (isMobile) return  // desktop-only hover behaviour
         if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return
         const rect = itemRef.current.getBoundingClientRect()
         const x = ev.clientX - rect.left
@@ -73,6 +90,7 @@ function FlowingMenuItem({ link, text, image, index }) {
     }
 
     const handleMouseLeave = (ev) => {
+        if (isMobile) return  // desktop-only hover behaviour
         if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return
         const rect = itemRef.current.getBoundingClientRect()
         const x = ev.clientX - rect.left
@@ -83,6 +101,13 @@ function FlowingMenuItem({ link, text, image, index }) {
             .timeline({ defaults: animationDefaults })
             .to(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)
             .to(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0)
+    }
+
+    // Mobile tap: activate this item (parent ensures only one is active)
+    const handleTouchStart = (ev) => {
+        if (!isMobile) return
+        ev.preventDefault()
+        onActivate()
     }
 
     const repeatedMarqueeContent = Array.from({ length: 4 }).map((_, idx) => (
@@ -98,6 +123,7 @@ function FlowingMenuItem({ link, text, image, index }) {
                 className="flowing-menu__item-link"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
             >
                 {text}
             </div>

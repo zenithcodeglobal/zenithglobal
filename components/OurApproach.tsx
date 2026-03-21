@@ -253,9 +253,10 @@ export default function OurApproach() {
         <div ref={containerRef} className="relative w-full bg-black text-white overflow-x-hidden">
 
             {/* === FIXED CANVAS FOR 3D ORB === */}
+            {/* === FIXED CANVAS FOR 3D ORB === */}
             <div
                 ref={mainOrbContainerRef}
-                className="fixed z-40 pointer-events-none"
+                className="fixed z-40 pointer-events-none hidden md:block"
                 style={{
                     width: isMobile ? '200px' : '600px',
                     height: isMobile ? '200px' : '600px',
@@ -288,43 +289,47 @@ export default function OurApproach() {
             </div>
 
             {/* === 1. HERO SECTION (ZENITH STANDARD) === */}
-            <section ref={heroRef} className="relative min-h-screen flex items-center pt-20 pb-20 overflow-hidden z-10">
+            <section ref={heroRef} className="relative min-h-[70vh] md:min-h-screen flex items-start md:items-center pt-[18vh] md:pt-20 pb-12 md:pb-20 overflow-hidden z-10">
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                    <div className="hero-blob-1 absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px]" />
-                    <div className="hero-blob-2 absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-teal-600/10 rounded-full blur-[120px]" />
+                    <div className="hero-blob-1 absolute top-[-5%] left-[-10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-cyan-600/10 rounded-full blur-[80px] md:blur-[120px]" />
+                    <div className="hero-blob-2 absolute bottom-[-10%] right-[-10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-teal-600/10 rounded-full blur-[100px] md:blur-[120px]" />
                 </div>
-                <div className="container mx-auto px-6 relative z-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div className="container mx-auto px-4 md:px-6 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
 
                         {/* LEFT: Content */}
-                        <div className="max-w-2xl pointer-events-auto">
+                        <div className="max-w-2xl mx-auto lg:mx-0 pointer-events-auto flex flex-col items-center text-center lg:items-start lg:text-left">
                             {/* Tagline */}
-                            <div className="hero-text-anim inline-flex items-center gap-3 mb-8">
-                                <div className="h-[1px] w-8 bg-cyan-500/50"></div>
-                                <span className="text-xs text-cyan-400 font-mono tracking-[0.2em] uppercase">Methodology</span>
+                            <div className="hero-text-anim inline-flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
+                                <div className="h-[1px] w-8 bg-cyan-500/50 hidden lg:block"></div>
+                                <span className="text-[10px] md:text-xs text-cyan-400 font-mono tracking-[0.2em] uppercase">Methodology</span>
+                                <div className="h-[1px] w-8 bg-cyan-500/50 hidden lg:block"></div>
                             </div>
 
                             {/* Headline */}
-                            <h1 className="hero-text-anim font-sans text-white/95 font-light leading-[1] tracking-tight text-[clamp(3rem,8vw,6.5rem)] mb-8">
-                                The Zenith <br />
+                            <h1 className="hero-text-anim font-sans text-white/95 font-light leading-[1.1] md:leading-[1] tracking-tight text-[clamp(2.5rem,8vw,6.5rem)] mb-6 md:mb-8">
+                                The Zenith <br className="hidden lg:block" />
                                 <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300">
                                     Standard.
                                 </span>
                             </h1>
 
                             {/* Description */}
-                            <p className="hero-text-anim text-white/60 text-[clamp(1rem,1.2vw,1.2rem)] mb-12 leading-relaxed font-light max-w-lg border-l border-white/10 pl-6">
+                            <p className="hero-text-anim text-white/60 text-[clamp(0.95rem,1.2vw,1.2rem)] mb-10 md:mb-12 leading-relaxed font-light max-w-[90%] md:max-w-lg lg:border-l lg:border-white/10 lg:pl-6">
                                 We don't rely on guesswork. We operate on a rigorous, engineering-first framework designed to eliminate technical debt before it begins.
-                                <br /><br />
-                                <span className="text-white/40 text-sm">Precision. Scalability. Future-Proofing.</span>
+                                <br className="hidden md:block" /><br className="hidden md:block" />
+                                <span className="text-white/40 text-[10px] md:text-sm mt-4 md:mt-0 flex flex-col md:inline-block">
+                                    <span className="md:hidden opacity-50 mb-1">Guarantees:</span>
+                                    Precision. Scalability. Future-Proofing.
+                                </span>
                             </p>
 
                             {/* System Status Ticker */}
-                            <div className="hero-text-anim flex flex-col gap-4">
-                                <div className="text-xs font-mono text-white/30 uppercase tracking-widest mb-2">System Parameters</div>
-                                <div className="flex flex-wrap gap-3">
+                            <div className="hero-text-anim flex flex-col items-center lg:items-start gap-3 md:gap-4">
+                                <div className="text-[10px] md:text-xs font-mono text-white/30 uppercase tracking-widest mb-1 md:mb-2">System Parameters</div>
+                                <div className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3">
                                     {['0% Bloat', '100% Type-Safe', 'Pixel-Perfect', 'Modular Arch'].map((tag, i) => (
-                                        <div key={i} className="px-3 py-1.5 rounded border border-white/5 bg-white/5 text-xs font-mono text-cyan-200/70">
+                                        <div key={i} className="px-2.5 md:px-3 py-1.5 rounded border border-white/5 bg-white/5 text-[9px] md:text-xs font-mono text-cyan-200/70">
                                             {tag}
                                         </div>
                                     ))}
@@ -337,7 +342,7 @@ export default function OurApproach() {
                     </div>
 
                     {/* Scroll Indicator */}
-                    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 opacity-30 mix-blend-screen">
+                    <div className="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 opacity-30 mix-blend-screen hidden md:flex">
                         <span className="text-[10px] uppercase tracking-[0.3em] text-white font-light">Initiate Sequence</span>
                         <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-cyan-500 to-transparent"></div>
                     </div>

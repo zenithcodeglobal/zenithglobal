@@ -22,23 +22,58 @@ export default function ZenithHero() {
     const whyZenithRef = useRef<HTMLDivElement>(null);
     const heroContentRef = useRef<HTMLDivElement>(null);
     const textWrapperRef = useRef<HTMLDivElement>(null);
+    // Stat counter refs (mobile only)
+    const yearsRef = useRef<HTMLSpanElement>(null);
+    const projectsRef = useRef<HTMLSpanElement>(null);
+    const clientsRef = useRef<HTMLSpanElement>(null);
+    const statsSectionRef = useRef<HTMLDivElement>(null);
 
     useGSAP(
         () => {
-            // 1. Initial State
-            // Video is already full screen Z-0.
-            // HeroContent is Z-10 covering it.
+            const isMobile = window.innerWidth < 768;
 
-            // Creates a natural bobbing sensation as user scrolls (independent of pinned timeline)
-            gsap.to(textWrapperRef.current, {
-                y: '-50px',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top bottom',
-                    end: 'top top',
-                    scrub: 1,
-                },
-            });
+            // Skip parallax/bobbing animations on mobile to avoid layout breakage
+            if (!isMobile) {
+                // Creates a natural bobbing sensation as user scrolls (independent of pinned timeline)
+                gsap.to(textWrapperRef.current, {
+                    y: '-50px',
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: 'top bottom',
+                        end: 'top top',
+                        scrub: 1,
+                    },
+                });
+            }
+
+            // Mobile-only: smooth count-up triggered exactly when the intro overlay finishes
+            if (isMobile) {
+                const runCountUp = () => {
+                    const counters = { years: 0, projects: 0, clients: 0 };
+                    gsap.to(counters, {
+                        years: 8,
+                        projects: 120,
+                        clients: 40,
+                        duration: 2.5,
+                        ease: 'power2.out',
+                        delay: 0.2,   // slight breath after the overlay exits
+                        onUpdate() {
+                            if (yearsRef.current) yearsRef.current.textContent = `${Math.round(counters.years)}+`;
+                            if (projectsRef.current) projectsRef.current.textContent = `${Math.round(counters.projects)}+`;
+                            if (clientsRef.current) clientsRef.current.textContent = `${Math.round(counters.clients)}+`;
+                        },
+                    });
+                };
+
+                // @ts-ignore
+                if (window.__introDone) {
+                    // Overlay already gone (e.g. fast client-side nav) — run shortly
+                    setTimeout(runCountUp, 150);
+                } else {
+                    // Wait for the overlay to signal completion
+                    window.addEventListener('intro:done', runCountUp, { once: true });
+                }
+            }
 
             const tl = gsap.timeline({
                 scrollTrigger: {
@@ -55,28 +90,27 @@ export default function ZenithHero() {
                 // Step A: Lift the Black Hero Sheet UP to reveal Video
                 .to(heroContentRef.current, {
                     y: '-100vh',
-                    duration: 3, // Takes significant scroll to lift
+                    duration: 3,
                     ease: 'power1.inOut',
-                }, 'start')
+                }, 'start');
 
-                // Step B: Text Parallax (Inner text moves slowly relative to wrapper)
-                .to(textRef.current, {
-                    y: '30vh', // Move DOWN 30vh relative to wrapper (which moves UP 100vh).
-                    // Net movement = UP 70vh. Text stays on screen longer/slower.
+            // Step B: Text Parallax — desktop only (stops ZENITH from sliding over subtitle on mobile)
+            if (!isMobile) {
+                tl.to(textRef.current, {
+                    y: '30vh',
                     duration: 3,
                     ease: 'none',
-                }, 'start')
+                }, 'start');
+            }
 
-                // Step C: Sequence the Video Overlays
-                // Wait until shutter is mostly up before swapping text
-
+            tl
                 // 1. Fade Out First Text
                 .to(overlayTextRef.current, {
                     opacity: 0,
                     y: -50,
                     duration: 1,
                     ease: 'power2.in',
-                }, '-=0.5') // Start fading out just as shutter finishes, or slightly before
+                }, '-=0.5')
 
                 // 2. Reveal Why Zenith
                 .to(whyZenithRef.current, {
@@ -150,32 +184,100 @@ export default function ZenithHero() {
             {/* Hero Content Shutter - Z-10 - Lifts up to reveal video */}
             <div
                 ref={heroContentRef}
-                className="absolute inset-0 w-full h-full z-10 bg-black flex flex-col items-center"
+                className="absolute inset-0 w-full h-full z-10 bg-black flex flex-col"
             >
-                {/* Main Massive Text - Centered on Mobile, Top Aligned on Desktop */}
-                <div ref={textWrapperRef} className="relative z-10 mt-[15vh] w-full flex flex-col items-center px-6 md:px-0">
+                {/* ── Single unified layout: CSS handles mobile vs desktop differences ── */}
+
+                {/* ZENITH + subtitle wrapper */}
+                <div
+                    ref={textWrapperRef}
+                    className="pt-[12vh] md:mt-[15vh] md:pt-0 w-full flex flex-col items-center px-4 md:px-0"
+                >
                     <h1
                         ref={textRef}
-                        className="font-[family-name:var(--font-outfit)] font-bold tracking-tight text-[#f0f0f0] leading-none whitespace-nowrap select-none"
+                        className="font-[family-name:var(--font-outfit)] font-bold tracking-tight text-[#f0f0f0] leading-none whitespace-nowrap select-none w-full text-center"
                         style={{ fontSize: '23vw' }}
                     >
                         ZENITH
                     </h1>
-                    {/* Mobile Description - Below ZENITH, left-aligned */}
-                    <div className="mt-6 max-w-md md:hidden text-left w-full">
+
+                    {/* Mobile-only subtitle — sits right below ZENITH */}
+                    <div className="mt-5 md:hidden text-left w-full px-2">
                         <p className="text-sm font-light text-white/90 leading-relaxed">
-                            We design and build intelligent systems <br />
+                            We design and build intelligent systems
+                            <br />
                             <span className="text-white/60">that scale with your business and drive real outcomes.</span>
                         </p>
                     </div>
                 </div>
 
-                {/* Bottom Content Area */}
+                {/* Mobile-only mid-section — fills the blank space with premium content */}
+                <div ref={statsSectionRef} className="flex-1 md:hidden flex flex-col justify-between px-4 pb-2 pt-6">
+
+                    {/* Thin rule */}
+                    <div className="w-full h-px bg-white/10 mb-6" />
+
+                    {/* Stats row — numbers animated by GSAP count-up on mobile */}
+                    <div className="grid grid-cols-3 gap-2 mb-6">
+                        {/* Years Experience */}
+                        <div className="flex flex-col items-center text-center">
+                            <span
+                                ref={yearsRef}
+                                className="font-[family-name:var(--font-outfit)] text-3xl font-bold text-white leading-none tracking-tight"
+                            >
+                                0+
+                            </span>
+                            <span className="mt-1 text-[10px] font-mono text-white/40 uppercase tracking-widest leading-tight whitespace-pre-line">
+                                {'Years\nExperience'}
+                            </span>
+                        </div>
+
+                        {/* Projects Delivered */}
+                        <div className="flex flex-col items-center text-center">
+                            <span
+                                ref={projectsRef}
+                                className="font-[family-name:var(--font-outfit)] text-3xl font-bold text-white leading-none tracking-tight"
+                            >
+                                0+
+                            </span>
+                            <span className="mt-1 text-[10px] font-mono text-white/40 uppercase tracking-widest leading-tight whitespace-pre-line">
+                                {'Projects\nDelivered'}
+                            </span>
+                        </div>
+
+                        {/* Enterprise Clients */}
+                        <div className="flex flex-col items-center text-center">
+                            <span
+                                ref={clientsRef}
+                                className="font-[family-name:var(--font-outfit)] text-3xl font-bold text-white leading-none tracking-tight"
+                            >
+                                0+
+                            </span>
+                            <span className="mt-1 text-[10px] font-mono text-white/40 uppercase tracking-widest leading-tight whitespace-pre-line">
+                                {'Enterprise\nClients'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Thin rule */}
+                    <div className="w-full h-px bg-white/10 mb-6" />
+
+                    {/* What we do tagline */}
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#DBD40F] flex-shrink-0" />
+                        <p className="text-xs font-light text-white/50 tracking-wide uppercase text-center">
+                            WEB · AI · Cloud · Digital Transformation
+                        </p>
+                    </div>
+
+                </div>
+
+                {/* Bottom content bar */}
                 <div
                     ref={bottomContentRef}
-                    className="absolute bottom-8 md:bottom-12 w-full px-6 md:px-12 flex flex-row justify-between items-end z-20">
-
-                    {/* Left: Intro Description */}
+                    className="w-full px-5 pb-8 md:absolute md:bottom-12 md:px-12 flex flex-row justify-between items-end z-20"
+                >
+                    {/* Desktop-only description */}
                     <div className="max-w-md hidden md:block">
                         <p className="text-sm md:text-base font-light text-white/90 leading-relaxed">
                             We design and build intelligent systems <br />
@@ -183,13 +285,11 @@ export default function ZenithHero() {
                         </p>
                     </div>
 
-                    {/* Center/Left: Scroll Button */}
-                    <div className="flex items-end md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:bottom-2">
+                    {/* Scroll button — left on mobile, centered on desktop */}
+                    <div className="md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:bottom-2">
                         <button
                             onClick={() => {
-                                // Scroll down to trigger the lift animation
                                 const targetScroll = window.innerHeight * 2.5;
-
                                 // @ts-ignore
                                 if (window.__lenis) {
                                     // @ts-ignore
@@ -204,7 +304,7 @@ export default function ZenithHero() {
                         </button>
                     </div>
 
-                    {/* Right: Values List */}
+                    {/* Values list */}
                     <div className="flex flex-col items-end text-right gap-1 md:gap-2">
                         {['Digital Precision /01', 'AI-Driven Innovation /02', 'Engineering Excellence /03'].map((item, i) => (
                             <div key={i} className="text-xs md:text-sm font-mono text-white/80 uppercase tracking-widest">

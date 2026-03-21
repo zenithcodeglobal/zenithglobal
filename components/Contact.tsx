@@ -1,11 +1,82 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import emailjs from '@emailjs/browser'
 import { Check, ChevronDown, Loader2 } from 'lucide-react'
 
 // You might need to install: npm install @emailjs/browser lucide-react
+
+// Custom Dropdown Component
+function CustomDropdown({
+    options,
+    value,
+    onChange,
+    label,
+    name
+}: {
+    options: string[],
+    value: string,
+    onChange: (name: string, value: string) => void,
+    label: string,
+    name: string
+}) {
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+
+    // Close on click outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    return (
+        <div className="relative group" ref={dropdownRef}>
+            <label className="absolute left-0 -top-2 text-xs text-white/50 z-10">{label}</label>
+            <div
+                onClick={() => setIsOpen(!isOpen)}
+                className={`w-full bg-transparent border-b py-4 text-white text-lg transition-all cursor-pointer flex justify-between items-center ${isOpen ? 'border-white/80' : 'border-white/20 hover:border-white/40'}`}
+            >
+                <span className={value ? 'text-white' : 'text-white/40'}>
+                    {value || `Select ${label.split(' ')[0]}`}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-white/40 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+            </div>
+
+            {/* Dropdown Menu */}
+            {isOpen && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    data-lenis-prevent="true"
+                    onWheel={(e) => e.stopPropagation()}
+                    onTouchMove={(e) => e.stopPropagation()}
+                    className="absolute top-full left-0 w-full mt-2 bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
+                >
+                    {options.map((option, i) => (
+                        <div
+                            key={i}
+                            onClick={() => {
+                                onChange(name, option)
+                                setIsOpen(false)
+                            }}
+                            className={`px-5 py-3 cursor-pointer text-white/80 transition-colors hover:bg-white/10 hover:text-white ${value === option ? 'bg-white/5 text-white' : ''}`}
+                        >
+                            {option}
+                        </div>
+                    ))}
+                </motion.div>
+            )}
+        </div>
+    )
+}
 
 export default function Contact() {
     const formRef = useRef<HTMLFormElement>(null)
@@ -46,8 +117,12 @@ export default function Contact() {
         "10k+"
     ]
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
+
+    const handleDropdownChange = (name: string, value: string) => {
+        setFormData(prev => ({ ...prev, [name]: value }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -199,60 +274,45 @@ export default function Contact() {
                                     </label>
                                 </div>
 
-                                {/* Service & Budget Grid */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Service Dropdown */}
-                                    <div className="relative group">
-                                        <select
-                                            name="service"
-                                            value={formData.service}
-                                            onChange={handleChange}
-                                            className="w-full bg-transparent border-b border-white/20 py-4 text-white text-lg focus:outline-none focus:border-white/80 transition-all appearance-none cursor-pointer"
-                                        >
-                                            <option value="" disabled className="bg-zinc-900">Select Service</option>
-                                            {services.map((s, i) => (
-                                                <option key={i} value={s} className="bg-zinc-900 text-white">{s}</option>
-                                            ))}
-                                        </select>
-                                        <label className="absolute left-0 -top-2 text-xs text-white/50">Service Interested In</label>
-                                        <ChevronDown className="absolute right-0 top-5 w-4 h-4 text-white/40 pointer-events-none" />
-                                    </div>
+                                {/* Hidden inputs for EmailJS since custom dropdowns don't natively submit value unless bound to form */}
+                                <input type="hidden" name="service" value={formData.service} />
+                                <input type="hidden" name="budget" value={formData.budget} />
 
-                                    {/* Budget Dropdown */}
-                                    <div className="relative group">
-                                        <select
-                                            name="budget"
-                                            value={formData.budget}
-                                            onChange={handleChange}
-                                            className="w-full bg-transparent border-b border-white/20 py-4 text-white text-lg focus:outline-none focus:border-white/80 transition-all appearance-none cursor-pointer"
-                                        >
-                                            <option value="" disabled className="bg-zinc-900">Select Budget</option>
-                                            {budgets.map((b, i) => (
-                                                <option key={i} value={b} className="bg-zinc-900 text-white">{b}</option>
-                                            ))}
-                                        </select>
-                                        <label className="absolute left-0 -top-2 text-xs text-white/50">Budget (Optional)</label>
-                                        <ChevronDown className="absolute right-0 top-5 w-4 h-4 text-white/40 pointer-events-none" />
-                                    </div>
+                                {/* Service & Budget Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-30">
+                                    <CustomDropdown
+                                        options={services}
+                                        value={formData.service}
+                                        onChange={handleDropdownChange}
+                                        label="Service Interested In"
+                                        name="service"
+                                    />
+                                    <CustomDropdown
+                                        options={budgets}
+                                        value={formData.budget}
+                                        onChange={handleDropdownChange}
+                                        label="Budget (Optional)"
+                                        name="budget"
+                                    />
                                 </div>
 
                                 {/* Message */}
-                                <div className="group relative mt-6">
+                                <div className="group relative mt-6 border-t border-transparent">
                                     <textarea
                                         name="message"
                                         value={formData.message}
                                         onChange={handleChange}
                                         placeholder=" "
                                         rows={4}
-                                        className="peer w-full bg-transparent border-b border-white/20 py-4 text-white text-lg focus:outline-none focus:border-white/80 transition-all resize-none font-[family-name:var(--font-manrope)]"
+                                        className="peer w-full bg-transparent border-b border-white/20 py-4 text-white text-lg focus:outline-none focus:border-white/80 transition-all resize-none font-[family-name:var(--font-manrope)] mt-8"
                                     />
-                                    <label className="absolute left-0 top-4 text-white/40 text-lg transition-all duration-300 pointer-events-none peer-focus:-top-2 peer-focus:text-xs peer-focus:text-white/70 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-white/70">
+                                    <label className="absolute left-0 top-12 text-white/40 text-lg transition-all duration-300 pointer-events-none peer-focus:top-4 peer-focus:text-xs peer-focus:text-white/70 peer-[:not(:placeholder-shown)]:top-4 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-white/70">
                                         Tell us about your project
                                     </label>
                                 </div>
 
                                 {/* Submit Button */}
-                                <div className="pt-6">
+                                <div className="pt-6 relative z-10">
                                     <button
                                         type="submit"
                                         disabled={status === 'loading'}
@@ -283,3 +343,4 @@ export default function Contact() {
         </section>
     )
 }
+

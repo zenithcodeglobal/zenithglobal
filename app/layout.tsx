@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${manrope.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${manrope.variable} antialiased selection:bg-purple-500/40 selection:text-white`}
       >
         <div
           id="intro-overlay-ssr"

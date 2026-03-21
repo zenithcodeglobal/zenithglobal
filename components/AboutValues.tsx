@@ -77,12 +77,11 @@ export default function AboutValues() {
     const [activeSection, setActiveSection] = useState("architects");
 
     return (
-        // Reduced vertical padding from py-24 to py-12
-        <div className="w-full bg-black text-white relative py-12">
-            <div className="container mx-auto px-6 md:px-12 flex flex-col lg:flex-row gap-12 lg:gap-24">
+        <div className="w-full bg-black text-white relative py-12 md:py-24">
+            <div className="container mx-auto px-6 md:px-12 flex flex-col lg:flex-row gap-0 lg:gap-24">
 
                 {/* --- LEFT SIDE (Sticky) --- */}
-                <div className="lg:w-1/3 pt-8 lg:pt-12">
+                <div className="hidden lg:block lg:w-1/3 pt-12">
                     <div className="sticky top-32 flex flex-col justify-center min-h-[20vh]">
                         <h2 className="font-sans text-white/95 font-extralight leading-[1.1] tracking-tight text-[clamp(3rem,5vw,5rem)]">
                             We are <br />
@@ -109,8 +108,13 @@ export default function AboutValues() {
                 </div>
 
                 {/* --- RIGHT SIDE (Scrolling List) --- */}
-                {/* Removed excessive bottom padding */}
-                <div className="lg:w-2/3 pb-12">
+                <div className="w-full lg:w-2/3 pb-0 lg:pb-12">
+                    {/* Mobile Only Header */}
+                    <div className="lg:hidden mb-12">
+                        <h2 className="font-sans text-white/95 font-extralight leading-[1.1] tracking-tight text-4xl">
+                            Our Core <br /> <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300">Values.</span>
+                        </h2>
+                    </div>
                     {content.map((section, index) => (
                         <ValueSection
                             key={section.id}
@@ -158,32 +162,29 @@ const ValueSection = ({
         <div
             ref={ref}
             id={id}
-            // SIGNIFICANT CHANGE HERE:
-            // 1. Reduced pt-24 to pt-4 (removes huge top gap)
-            // 2. Reduced mb-32/48 to mb-16/24 (removes huge gap between groups)
-            className={`flex flex-col ${isLast ? "mb-0" : "mb-16 lg:mb-24"} pt-4`}
+            className={`flex flex-col ${isLast ? "mb-0" : "mb-16 lg:mb-24"} pt-0 lg:pt-4`}
         >
             {/* Mobile-only visible headline */}
-            <h3 className="lg:hidden text-3xl font-light text-white mb-8 border-b border-white/20 pb-4">
+            <h3 className="lg:hidden text-2xl font-light text-cyan-400 mb-6 border-b border-white/10 pb-4">
                 {data.headline}
             </h3>
 
             {data.values.map((item, index) => (
                 <div
                     key={index}
-                    className="group border-t border-white/10 py-10 transition-all duration-500 hover:border-white/40"
+                    className="group border-t border-white/10 py-6 md:py-10 transition-all duration-500 hover:border-white/40"
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
                 >
-                    <div className="flex flex-col md:flex-row gap-4 md:gap-12 md:items-start">
+                    <div className="flex flex-col md:flex-row gap-2 md:gap-12 md:items-start">
                         <h3
-                            className={`text-xl md:text-2xl font-light transition-colors duration-300 min-w-[200px] ${hoveredIndex === index ? "text-white" : "text-white/60"
+                            className={`text-lg md:text-2xl font-light transition-colors duration-300 min-w-[200px] ${hoveredIndex === index ? "text-white" : "text-white/60"
                                 }`}
                         >
                             {item.term}
                         </h3>
 
-                        <p className="text-lg text-white/40 max-w-lg leading-relaxed font-light transition-colors duration-300 group-hover:text-white/80">
+                        <p className="text-base md:text-lg text-white/40 max-w-lg leading-relaxed font-light transition-colors duration-300 group-hover:text-white/80">
                             {item.desc}
                         </p>
                     </div>
