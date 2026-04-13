@@ -5,24 +5,24 @@ import { motion } from "framer-motion";
 
 const teamImages = [
     {
-        src: "/AboutUs_1.jpg",
+        src: "/AboutUs_1.webp",
         alt: "Team collaboration",
-        height: "h-[220px] md:h-[340px]" // Medium
+        height: "h-[260px] md:h-[340px]" // Medium
     },
     {
-        src: "/AboutUs_2.jpg",
+        src: "/AboutUs_2.webp",
         alt: "Team working",
-        height: "h-[280px] md:h-[400px]" // Tall
+        height: "h-[300px] md:h-[400px]" // Tall
     },
     {
-        src: "/AboutUs_3.jpg",
+        src: "/AboutUs_3.webp",
         alt: "Team meeting",
-        height: "h-[200px] md:h-[320px]" // Short
+        height: "h-[240px] md:h-[320px]" // Short
     },
     {
-        src: "/AboutUs_4.jpg",
+        src: "/AboutUs_4.webp",
         alt: "Team brainstorming session",
-        height: "h-[250px] md:h-[380px]" // Medium-Tall
+        height: "h-[280px] md:h-[380px]" // Medium-Tall
     }
 ];
 
@@ -54,7 +54,7 @@ export default function AboutHero() {
 
     return (
         <div className="w-full bg-black text-white pt-24 md:pt-32 pb-8 overflow-hidden">
-            <div className="container mx-auto px-6 md:px-12 mb-8 md:mb-12">
+            <div className="container mx-auto px-6 md:px-12 mb-4 md:mb-12">
 
                 {/* Heading at Top */}
                 <motion.h1
@@ -82,7 +82,7 @@ export default function AboutHero() {
                             ease: "linear"
                         }
                     }}
-                    className="flex gap-0 items-end"
+                    className="flex gap-0 items-start md:items-end"
                 >
                     {duplicatedImages.map((image, index) => {
                         const hasRoundedCorners = shouldRoundCorners(index);

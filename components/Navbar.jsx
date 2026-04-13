@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -133,9 +133,8 @@ export default function Navbar() {
   const contactBtnClass = lightBg
     ? 'bg-black/10 hover:bg-black/20 hover:text-black text-black/80 border-black/20'
     : 'bg-white/10 hover:bg-white/20 hover:text-white text-white/80 border-white/10'
-  const mobileBtnClass = lightBg
-    ? 'bg-black/10 text-black/90 hover:bg-black/20'
-    : 'bg-white/10 text-white/90 hover:bg-white/20'
+
+
 
   return (
     <motion.header
@@ -227,54 +226,145 @@ export default function Navbar() {
             aria-label="Toggle menu"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className={`md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full z-50 backdrop-blur-md transition-colors duration-400 ${mobileBtnClass}`}
+            className="md:hidden relative z-[110] inline-flex h-10 w-10 items-center justify-center"
           >
             <span className="sr-only">Menu</span>
-            {open ? (
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M6 6l12 12M6 18L18 6" />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            )}
+            <div className="w-6 h-[14px] relative flex flex-col justify-between">
+              <span
+                className={`block h-[2px] origin-center transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? 'bg-white w-full rotate-45 translate-y-[6px]' : `${lightBg ? 'bg-black/80' : 'bg-white/80'} w-full`}`}
+              />
+              <span
+                className={`block h-[2px] origin-right transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? 'bg-white opacity-0 w-0' : `${lightBg ? 'bg-black/80' : 'bg-white/80'} w-3/4`}`}
+              />
+              <span
+                className={`block h-[2px] origin-center transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? 'bg-white w-full -rotate-45 -translate-y-[6px]' : `${lightBg ? 'bg-black/80' : 'bg-white/80'} w-1/2`}`}
+              />
+            </div>
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {open && (
-        <motion.div 
-          className="md:hidden fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl overflow-hidden touch-none overscroll-none min-h-screen" 
-          onClick={() => setOpen(false)}
-          data-lenis-prevent="true"
-        >
-          <button
-            aria-label="Close menu"
-            onClick={() => setOpen(false)}
-            className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-md bg-white/10 text-white/90 hover:bg-white/20"
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="md:hidden fixed inset-0 z-[100] overflow-hidden touch-none overscroll-none"
+            data-lenis-prevent="true"
+            initial="closed"
+            animate="open"
+            exit="closed"
           >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M6 6l12 12M6 18L18 6" />
-            </svg>
-          </button>
-          <div className="mx-auto mt-24 w-full px-6 flex flex-col gap-8">
-            {items.map((i) => (
-              <Link
-                key={i.label}
-                href={i.href}
-                className="text-white/90 text-2xl font-light tracking-wide border-b border-white/10 pb-4"
+            {/* Backdrop */}
+            <motion.div
+              className="absolute inset-0 bg-black/[0.97] backdrop-blur-2xl"
+              variants={{
+                closed: { opacity: 0 },
+                open: { opacity: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+              }}
+              onClick={() => setOpen(false)}
+            />
+
+            {/* Content container */}
+            <div className="relative z-10 flex flex-col h-full px-6 pt-24 pb-10">
+              {/* Navigation links */}
+              <nav className="flex-1 flex flex-col justify-start gap-2">
+                {items.map((item, index) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <motion.div
+                      key={item.label}
+                      variants={{
+                        closed: { opacity: 0, x: -40 },
+                        open: {
+                          opacity: 1,
+                          x: 0,
+                          transition: {
+                            duration: 0.5,
+                            delay: 0.1 + index * 0.08,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        },
+                      }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className="group flex items-baseline gap-4 py-4"
+                      >
+                        <span className={`font-mono text-xs tracking-widest transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className={`font-[family-name:var(--font-outfit)] text-[clamp(1.75rem,6vw,2.5rem)] font-light tracking-tight leading-tight transition-all duration-300 ${isActive ? 'text-white' : 'text-white/70 group-hover:text-white'}`}>
+                          {item.label}
+                        </span>
+                        {isActive && (
+                          <motion.span
+                            layoutId="mobile-nav-active"
+                            className="ml-auto w-1.5 h-1.5 rounded-full bg-white"
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          />
+                        )}
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+              </nav>
+
+              {/* CTA Buttons */}
+              <motion.div
+                className="flex flex-col gap-3"
+                variants={{
+                  closed: { opacity: 0, y: 20 },
+                  open: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.5, delay: 0.45, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
               >
-                {i.label}
-              </Link>
-            ))}
-            <Link href="/contact" className="mt-4 inline-flex justify-center rounded-sm bg-white text-black px-6 py-3 font-mono text-sm uppercase tracking-widest">
-              Get in touch
-            </Link>
-          </div>
-        </motion.div>
-      )}
+                <Link
+                  href="/contact"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-3 w-full py-4 bg-white text-black rounded-sm font-mono text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:bg-white/90"
+                >
+                  Get in touch
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="translate-y-[0.5px]">
+                    <path d="M1 13L13 1M13 1H3M13 1V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Link>
+                <a
+                  href="https://zenithcodestore.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-3 w-full py-4 border border-white/15 text-white rounded-sm font-mono text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:border-white/30 hover:bg-white/5"
+                >
+                  Visit Store
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="opacity-60">
+                    <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+              </motion.div>
+
+              {/* Bottom info */}
+              <motion.div
+                className="mt-6 flex items-center justify-between"
+                variants={{
+                  closed: { opacity: 0 },
+                  open: {
+                    opacity: 1,
+                    transition: { duration: 0.4, delay: 0.55, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
+              >
+                <span className="font-mono text-[10px] tracking-widest text-white/30 uppercase">
+                  zenithcode.global@gmail.com
+                </span>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   )
 }

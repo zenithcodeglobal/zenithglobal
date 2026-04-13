@@ -9,12 +9,26 @@ export default function Footer() {
 
             {/* Top Section: Email & Socials (Right Aligned) */}
             <div className="flex flex-col items-end w-full">
-                <a
-                    href="mailto:zenithcode.global@gmail.com"
-                    className="text-sm md:text-base font-[family-name:var(--font-manrope)] tracking-wide hover:text-white/70 transition-colors uppercase mb-6"
-                >
-                    zenithcode.global@gmail.com
-                </a>
+                <div className="flex items-center gap-6 mb-6">
+                    <a
+                        href="https://zenithcodestore.vercel.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm md:text-base font-[family-name:var(--font-manrope)] tracking-wide hover:text-white/70 transition-colors uppercase flex items-center gap-1.5"
+                    >
+                        Store
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="opacity-50">
+                            <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </a>
+                    <span className="w-px h-4 bg-white/20" />
+                    <a
+                        href="mailto:zenithcode.global@gmail.com"
+                        className="text-sm md:text-base font-[family-name:var(--font-manrope)] tracking-wide hover:text-white/70 transition-colors uppercase"
+                    >
+                        zenithcode.global@gmail.com
+                    </a>
+                </div>
 
                 <div className="flex items-center gap-4">
                     <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 hover:bg-white/10 rounded-sm transition-colors group">

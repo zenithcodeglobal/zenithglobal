@@ -26,7 +26,8 @@ export default function BackgroundVideo() {
       muted
       loop
       playsInline
-      preload="auto"
+      preload="none"
+      poster="/landing_bg_poster.webp"
       initial={{ opacity: 0 }}
       animate={ready ? { opacity: 1 } : { opacity: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}

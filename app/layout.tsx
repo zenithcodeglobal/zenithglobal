@@ -48,6 +48,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://prod.spline.design" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${manrope.variable} antialiased selection:bg-purple-500/40 selection:text-white`}
       >

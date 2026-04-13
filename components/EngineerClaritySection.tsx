@@ -40,7 +40,9 @@ export default function EngineerClaritySection() {
                     muted
                     loop
                     playsInline
-                    className="w-full h-full object-cover opacity-60" // Dimmed specifically for text readability
+                    preload="none"
+                    poster="/landing_page_2_poster.webp"
+                    className="w-full h-full object-cover opacity-60"
                 />
                 <div className="absolute inset-0 bg-black/40" /> {/* Extra overlay layer */}
             </div>

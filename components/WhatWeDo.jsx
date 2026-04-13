@@ -40,7 +40,7 @@ export default function WhatWeDo() {
   return (
     <section ref={ref} className="relative w-full bg-black">
       <div id="wwd-hero-video" className="relative h-[100dvh] w-full" onMouseLeave={() => setReveal(false)}>
-        <video src="/what_we_do.mp4" autoPlay muted loop playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover" />
+        <video src="/what_we_do.mp4" autoPlay muted loop playsInline preload="none" poster="/what_we_do_poster.webp" className="absolute inset-0 h-full w-full object-cover" />
         <motion.div
           initial={{ opacity: 0.5 }}
           animate={{ opacity: reveal ? 0 : 0.5 }}
@@ -376,7 +376,7 @@ function ExpertiseSection() {
 function PartnershipsSection() {
   const partnerItems = [
     {
-      image: '/what_we_do_impact_1.jpg',
+      image: '/what_we_do_impact_1.webp',
       title: 'System Architecture',
       subtitle: 'Scalable Foundations',
       borderColor: '#3B82F6',
@@ -385,7 +385,7 @@ function PartnershipsSection() {
       description: "We design robust system architectures that grow with your business, secure, modular, and built for long-term scalability."
     },
     {
-      image: '/what_we_do_impact_2.jpg',
+      image: '/what_we_do_impact_2.webp',
       title: 'Cloud & Infrastructure',
       subtitle: 'Reliable by Design',
       borderColor: '#10B981',
@@ -394,7 +394,7 @@ function PartnershipsSection() {
       description: "From deployment to monitoring, we build cloud infrastructure that is fast, resilient, and cost-efficient."
     },
     {
-      image: '/what_we_do_impact_3.jpg',
+      image: '/what_we_do_impact_3.webp',
       title: 'AI & Automation',
       subtitle: 'Intelligence in Action',
       borderColor: '#F59E0B',
@@ -403,7 +403,7 @@ function PartnershipsSection() {
       description: "We integrate AI and automation to streamline workflows, reduce manual effort, and unlock smarter decision-making."
     },
     {
-      image: '/what_we_do_impact_4.jpg',
+      image: '/what_we_do_impact_4.webp',
       title: 'Product Engineering',
       subtitle: 'Built for Users',
       borderColor: '#EF4444',
@@ -412,7 +412,7 @@ function PartnershipsSection() {
       description: "We craft high-performance web and app experiences with clean code, intuitive UI, and measurable business impact."
     },
     {
-      image: '/what_we_do_impact_5.jpg',
+      image: '/what_we_do_impact_5.webp',
       title: 'Data & Analytics',
       subtitle: 'Insights That Matter',
       borderColor: '#8B5CF6',
@@ -421,7 +421,7 @@ function PartnershipsSection() {
       description: "We transform raw data into clear dashboards and insights that help teams act faster and smarter."
     },
     {
-      image: '/what_we_do_impact_6.jpg',
+      image: '/what_we_do_impact_6.webp',
       title: 'Integration & APIs',
       subtitle: 'Everything Connected',
       borderColor: '#06B6D4',

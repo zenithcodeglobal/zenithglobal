@@ -85,6 +85,7 @@ export default function OurApproach() {
     const techSectionRef = useRef<HTMLDivElement>(null);
     const [splineLoaded, setSplineLoaded] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [shouldLoadSpline, setShouldLoadSpline] = useState(false);
 
     // Detect mobile on mount and resize
     useEffect(() => {
@@ -95,6 +96,23 @@ export default function OurApproach() {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    useEffect(() => {
+        if (isMobile || shouldLoadSpline) return;
+        const el = mainOrbContainerRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setShouldLoadSpline(true);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: '200px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [isMobile, shouldLoadSpline]);
 
     useGSAP(() => {
         const cards = gsap.utils.toArray('.approach-card');
@@ -270,21 +288,17 @@ export default function OurApproach() {
                 <div className="absolute -inset-4 rounded-full bg-cyan-500/15 blur-[40px] animate-pulse" style={{ animationDelay: '0.5s' }} />
 
                 <div className="relative w-full h-full rounded-full overflow-hidden cursor-grab active:cursor-grabbing pointer-events-auto">
-                    {!splineLoaded && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-16 h-16 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+                    {shouldLoadSpline && !isMobile && (
+                        <div className="relative w-full h-full" style={{ filter: 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.4))' }}>
+                            <div className="w-full h-full scale-125 origin-center">
+                                <Spline
+                                    scene="https://prod.spline.design/XSwNW8D1nX3OM3Mc/scene.splinecode"
+                                    onLoad={() => setSplineLoaded(true)}
+                                    className={`w-full h-full transition-opacity duration-1000 ${splineLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                />
+                            </div>
                         </div>
                     )}
-
-                    <div className="relative w-full h-full" style={{ filter: 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.4))' }}>
-                        <div className="w-full h-full scale-125 origin-center">
-                            <Spline
-                                scene="https://prod.spline.design/XSwNW8D1nX3OM3Mc/scene.splinecode"
-                                onLoad={() => setSplineLoaded(true)}
-                                className={`w-full h-full transition-opacity duration-1000 ${splineLoaded ? 'opacity-100' : 'opacity-0'}`}
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
 

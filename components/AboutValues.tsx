@@ -110,9 +110,10 @@ export default function AboutValues() {
                 {/* --- RIGHT SIDE (Scrolling List) --- */}
                 <div className="w-full lg:w-2/3 pb-0 lg:pb-12">
                     {/* Mobile Only Header */}
-                    <div className="lg:hidden mb-12">
-                        <h2 className="font-sans text-white/95 font-extralight leading-[1.1] tracking-tight text-4xl">
-                            Our Core <br /> <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300">Values.</span>
+                    <div className="lg:hidden mb-10">
+                        <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-3 font-[family-name:var(--font-manrope)]">What drives us</p>
+                        <h2 className="font-[family-name:var(--font-outfit)] text-white font-light leading-[1.1] tracking-tight text-5xl">
+                            Our Core <br /> <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-300">Values.</span>
                         </h2>
                     </div>
                     {content.map((section, index) => (
@@ -120,6 +121,7 @@ export default function AboutValues() {
                             key={section.id}
                             id={section.id}
                             data={section}
+                            sectionIndex={index}
                             setActiveSection={setActiveSection}
                             isLast={index === content.length - 1}
                         />
@@ -135,11 +137,13 @@ export default function AboutValues() {
 const ValueSection = ({
     id,
     data,
+    sectionIndex,
     setActiveSection,
     isLast,
 }: {
     id: string;
     data: typeof content[0];
+    sectionIndex: number;
     setActiveSection: (id: string) => void;
     isLast: boolean;
 }) => {
@@ -162,29 +166,36 @@ const ValueSection = ({
         <div
             ref={ref}
             id={id}
-            className={`flex flex-col ${isLast ? "mb-0" : "mb-16 lg:mb-24"} pt-0 lg:pt-4`}
+            className={`flex flex-col ${isLast ? "mb-0" : "mb-10 lg:mb-24"} pt-0 lg:pt-4`}
         >
-            {/* Mobile-only visible headline */}
-            <h3 className="lg:hidden text-2xl font-light text-cyan-400 mb-6 border-b border-white/10 pb-4">
-                {data.headline}
-            </h3>
+            {/* Mobile-only visible headline — redesigned as prominent section divider */}
+            <div className="lg:hidden flex items-center gap-4 mb-6 pb-4 border-b border-white/10">
+                <span className="text-[10px] font-mono text-white/20 tracking-wider">0{sectionIndex + 1}</span>
+                <h3 className="text-3xl font-[family-name:var(--font-outfit)] font-light text-white">
+                    {data.headline}
+                </h3>
+            </div>
 
             {data.values.map((item, index) => (
                 <div
                     key={index}
-                    className="group border-t border-white/10 py-6 md:py-10 transition-all duration-500 hover:border-white/40"
+                    className="group border-t border-white/10 py-5 md:py-10 transition-all duration-500 hover:border-white/40"
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
                 >
                     <div className="flex flex-col md:flex-row gap-2 md:gap-12 md:items-start">
-                        <h3
-                            className={`text-lg md:text-2xl font-light transition-colors duration-300 min-w-[200px] ${hoveredIndex === index ? "text-white" : "text-white/60"
-                                }`}
-                        >
-                            {item.term}
-                        </h3>
+                        {/* Mobile: term with subtle number indicator */}
+                        <div className="flex items-baseline gap-3 md:gap-0 min-w-[200px]">
+                            <span className="text-[10px] font-mono text-white/15 md:hidden">{String(index + 1).padStart(2, '0')}</span>
+                            <h3
+                                className={`text-base md:text-2xl font-medium md:font-light transition-colors duration-300 ${hoveredIndex === index ? "text-white" : "text-white/80 md:text-white/60"
+                                    }`}
+                            >
+                                {item.term}
+                            </h3>
+                        </div>
 
-                        <p className="text-base md:text-lg text-white/40 max-w-lg leading-relaxed font-light transition-colors duration-300 group-hover:text-white/80">
+                        <p className="text-sm md:text-lg text-white/40 max-w-lg leading-relaxed font-light transition-colors duration-300 group-hover:text-white/80 pl-7 md:pl-0">
                             {item.desc}
                         </p>
                     </div>

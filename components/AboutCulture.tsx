@@ -25,12 +25,12 @@ export default function AboutCulture() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="font-sans text-white/95 font-extralight leading-[1.1] tracking-tight text-[clamp(2rem,5vw,4rem)] mb-12 md:mb-20"
+                    className="font-[family-name:var(--font-outfit)] text-white/95 font-extralight leading-[1.1] tracking-tight text-[clamp(2rem,5vw,4rem)] mb-12 md:mb-20"
                 >
                     A culture of excellence
                 </motion.h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-12">
                     {culturePoints.map((point, index) => (
                         <motion.div
                             key={index}
@@ -38,9 +38,13 @@ export default function AboutCulture() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.2 }}
+                            className="border border-white/[0.06] rounded-xl p-5 md:border-0 md:rounded-none md:p-0"
                         >
-                            <h3 className="text-xl font-light text-white/95 mb-4">{point.title}</h3>
-                            <p className="text-white/50 leading-relaxed font-light">
+                            <div className="flex items-baseline gap-3 mb-3 md:mb-4">
+                                <span className="text-[10px] font-mono text-white/20 md:hidden">{String(index + 1).padStart(2, '0')}</span>
+                                <h3 className="text-lg md:text-xl font-light text-white/95">{point.title}</h3>
+                            </div>
+                            <p className="text-sm md:text-base text-white/50 leading-relaxed font-light pl-6 md:pl-0">
                                 {point.desc}
                             </p>
                         </motion.div>

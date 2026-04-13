@@ -161,6 +161,8 @@ export default function ProjectShowcaseSection({ project }: ProjectShowcaseSecti
                                     <img
                                         src={image}
                                         alt={`${project.name} - Image ${index + 1}`}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover object-top"
                                         style={{
                                             width: `${imageWidth}px`,

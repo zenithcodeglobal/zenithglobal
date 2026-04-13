@@ -35,6 +35,8 @@ export default function ShippingShowcaseSection() {
                 loop
                 muted
                 playsInline
+                preload="none"
+                poster="/our_work_bg_poster.webp"
                 className="absolute top-0 left-0 w-full h-full object-cover"
             >
                 <source src="/our_work_bg_video_1080p.mp4" type="video/mp4" />
